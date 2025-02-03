@@ -1,7 +1,3 @@
-<div style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
-    <img src="https://github.com/user-attachments/assets/85995e61-375a-4b11-bf9e-362ea227567b" alt="Image" style="width: 300px;">
-</div>
-
 Овој додаток е создаден како дел од предметот Компјутерска анимација на ФИНКИ и овозможува визуелизација на различни типови на податоци директно во 3D просторот на Blender.
 
 # Документација
@@ -26,7 +22,9 @@
 ## Импортирање на текстуални датотеки – Анализа на текстови и креирање на:
 
 * Word Frequency Clouds – Визуелизација на најчестите зборови во текст.
-
+<div style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
+    <img src="https://github.com/user-attachments/assets/85995e61-375a-4b11-bf9e-362ea227567b" alt="Image" style="width: 300px;">
+</div>
 * TF-IDF Word Clouds – Прикажување на најрелевантните зборови базирано на TF-IDF алгоритам.
 
 * Topic Modeling Clouds – Генерирање облаци на зборови базирани на теми извлечени со Latent Dirichlet Allocation (LDA).
@@ -59,3 +57,7 @@
 3. Експортирање
 
 Можете да го зачувате финалниот графикон како .blend фајл или да го рендерирате како слика/анимација.
+<br><br>
+
+<img src="https://user-images.githubusercontent.com/82838042/177052296-0b90e46b-1859-4222-9386-d6936a976aff.gif" alt="Customize" align="right" width="150"/> <br /><br/>
+
