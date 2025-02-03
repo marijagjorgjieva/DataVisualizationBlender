@@ -1,7 +1,12 @@
+<div style="width: 100%; height: 100vh; display: flex; justify-content: center; align-items: center;">
+    <img src="https://github.com/user-attachments/assets/85995e61-375a-4b11-bf9e-362ea227567b" alt="Image" style="width: 300px;">
+</div>
+
 Овој додаток е создаден како дел од предметот Компјутерска анимација на ФИНКИ и овозможува визуелизација на различни типови на податоци директно во 3D просторот на Blender.
 
 # Документација
 &emsp;Деталната документација за играта можете да ја најдете <a href="https://github.com/marijagjorgjieva/DataVisualizationBlender/wiki">овде</a> (ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+
 
 # Функционалности
 
