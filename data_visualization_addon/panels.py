@@ -112,6 +112,10 @@ class VIEW3D_PT_CsvImporterPanel(bpy.types.Panel):
         
         csv_filename = context.scene.csv_filename if hasattr(context.scene, 'csv_filename') else "No file selected"
         layout.label(text=f"Selected file: {csv_filename}")
+
+        layout.prop(context.scene, "csv_column_x", text="Column for X")
+        layout.prop(context.scene, "csv_column_y", text="Column for Y")
+        layout.prop(context.scene, "csv_column_z", text="Column for Z")
         
 class VIEW3D_PT_ScatterPlotPanel(bpy.types.Panel):
     bl_idname = "VIEW3D_PT_scatter_plot"
@@ -123,6 +127,8 @@ class VIEW3D_PT_ScatterPlotPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout
+        scene = context.scene
+        layout.prop(scene, "scatter_plot_color", text="Scatter Plot Color")
         layout.operator("object.create_scatter_plot", text="Apply Scatter Plot")
         layout.operator("object.delete_scatter_plot", text="Delete Scatter Plot")
 
