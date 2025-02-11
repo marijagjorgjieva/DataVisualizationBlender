@@ -203,7 +203,10 @@ def create_axis(context, axis, color):
     axis_length = 5
     csv_filepath = getattr(context.scene, "csv_filepath", "")
     if csv_filepath and os.path.exists(csv_filepath):
-        max_val = get_max_value_from_csv(csv_filepath)
+        col_x = context.scene.csv_column_x
+        col_y = context.scene.csv_column_y
+        col_z = context.scene.csv_column_z
+        max_val = get_max_value_from_csv(csv_filepath, col_x, col_y, col_z)
         if max_val > 0:
             axis_length = int(max_val)
     axis_width = 0.1
@@ -286,18 +289,16 @@ def create_axis(context, axis, color):
     bm.free()
     return obj
 
-def get_max_value_from_csv(filepath):
-    """Reads the CSV file and returns the maximum absolute value found among all coordinates."""
+def get_max_value_from_csv(filepath, col_x, col_y, col_z):
     max_val = 0
     try:
         with open(filepath, newline='') as csvfile:
             csv_reader = csv.DictReader(csvfile)
             for row in csv_reader:
                 try:
-                    # Expect each row to have three numbers: x, y, z
-                    x = float(row.get('X', 0))  # Default to 0 if 'X' column is missing
-                    y = float(row.get('Y', 0))  # Default to 0 if 'Y' column is missing
-                    z = float(row.get('Z', 0))  # Default to 0 if 'Z' column is missing
+                    x = float(row.get(col_x, 0))
+                    y = float(row.get(col_y, 0))
+                    z = float(row.get(col_z, 0))
                     max_in_row = max(abs(x), abs(y), abs(z))
                     if max_in_row > max_val:
                         max_val = max_in_row
@@ -342,12 +343,15 @@ def create_line_chart(context):
     try:
         with open(csv_filepath, newline='') as csvfile:
             csv_reader = csv.DictReader(csvfile)
+            col_x = context.scene.csv_column_x
+            col_y = context.scene.csv_column_y
+            col_z = context.scene.csv_column_z
             for row in csv_reader:
                 try:
                     # Expect each row to have three numeric values: X, Y, Z
-                    x = float(row.get('X', 0))
-                    y = float(row.get('Y', 0))
-                    z = float(row.get('Z', 0))
+                    x = float(row.get(col_x, 0))
+                    y = float(row.get(col_y, 0))
+                    z = float(row.get(col_z, 0))
                     points.append((x, y, z))
                 except Exception as e:
                     print(f"Skipping row {row}: {e}")
@@ -421,12 +425,16 @@ def create_bar_chart(context):
     try:
         with open(csv_filepath, newline='') as csvfile:
             csv_reader = csv.DictReader(csvfile)
+            col_x = context.scene.csv_column_x
+            col_y = context.scene.csv_column_y
+            col_z = context.scene.csv_column_z
             for row in csv_reader:
                 try:
                     # Expect each row to have two numeric values: X, Y
-                    x = float(row.get('X', 0))
-                    y = float(row.get('Y', 0))
-                    points.append((x, y))
+                    x = float(row.get(col_x, 0))
+                    y = float(row.get(col_y, 0))
+                    z = float(row.get(col_z, 0))
+                    points.append((x, y,z))
                 except Exception as e:
                     print(f"Skipping row {row}: {e}")
     except Exception as e:
@@ -436,20 +444,6 @@ def create_bar_chart(context):
     if not points:
         print("No valid points found in CSV")
         return {'CANCELLED'}
-
-    # Build a dictionary grouping indices by their x value.
-    duplicate_x_indices = {}
-    for idx, (x, y) in enumerate(points):
-        duplicate_x_indices.setdefault(x, []).append(idx)
-
-    # Identify which point(s) to shift: for each duplicate group,
-    # choose the one with the lowest y value.
-    indices_to_shift = set()
-    for x, indices in duplicate_x_indices.items():
-        if len(indices) > 1:
-            # Find index with the lowest y value
-            lowest_index = min(indices, key=lambda i: points[i][1])
-            indices_to_shift.add(lowest_index)
 
     # Create or get the "BarChart" collection
     bar_collection = bpy.data.collections.get("BarChart")
@@ -462,19 +456,16 @@ def create_bar_chart(context):
 
    
     # Create bars (3D cubes) for each point
-    for i, (x, y) in enumerate(points):
-        # Calculate the bar location.
-        # The bar is normally located at (x, y/2, 0),
-        # but if this point has a duplicate x and is the one with the lowest y,
-        # shift it by +1 along the z axis.
-        z_shift = 1 if i in indices_to_shift else 0
-        location = (x, y / 2, z_shift)
+    for i, (x, y,z) in enumerate(points):
+        location = (x, y / 2, z/2)
         variant_color = vary_color(base_color, variation=0.4)
         material = create_material_from_color_with_alpha(variant_color)
         # Create a cube mesh for the bar
         bpy.ops.mesh.primitive_cube_add(size=1, location=location)
         bar_obj = bpy.context.object
-        bar_obj.scale = (bar_width, y, 1)  # Set scale to create a rectangle shape
+        if z == 0:
+            z = 1
+        bar_obj.scale = (bar_width, y, z)  # Set scale to create a rectangle shape
         bar_obj.name = f"Bar_{i+1}"
         bar_obj.data.materials.append(material)
         
@@ -485,6 +476,7 @@ def create_bar_chart(context):
 
     print(f"Bar chart created with {len(points)} bars")
     return {'FINISHED'}
+
 
 
 def vary_color(color, variation=0.2):
@@ -556,9 +548,11 @@ def create_histogram(context):
     try:
         with open(csv_filepath, newline='') as csvfile:
             csv_reader = csv.DictReader(csvfile)
+            col_x = context.scene.csv_column_x
             for row in csv_reader:
                 try:
-                    v = float(row.get('X', 0))
+                    col_x = context.scene.csv_column_x
+                    v = float(row.get(col_x, 0))
                     values.append(v)
                 except Exception as e:
                     print(f"Skipping row {row}: {e}")
@@ -694,7 +688,6 @@ def generate_topic_model(filepath, n_topics=5, word_limit=50):
 
     custom_stopwords = ["and", "the", "to", "a", "of", "in", "for", "on", "with", "that", "this", "an"]
 
-    # Pass the custom stopwords when calling process_text
     processed_text = process_text_lda(text, custom_stopwords)
 
     # Vectorize the text into a document-term matrix (count vectorization)
@@ -711,18 +704,15 @@ def generate_topic_model(filepath, n_topics=5, word_limit=50):
     for topic_idx, topic in enumerate(lda.components_):
         topic_words[topic_idx] = [words[i] for i in topic.argsort()[:-word_limit - 1:-1]]
 
-    # Define parameters for clustering topics:
-    global_radius = 15  # distance from the origin for each topic cluster center
-    local_spread = 2    # how far words are scattered around the topic center
-    z_spread = 2        # spread along the Z-axis
+    global_radius = 15  
+    local_spread = 2    
+    z_spread = 2        
 
-    # Arrange topic clusters in a circle
     for topic_idx, words_in_topic in topic_words.items():
         angle = 2 * np.pi * topic_idx / n_topics
         center_x = global_radius * np.cos(angle)
         center_y = global_radius * np.sin(angle)
         
-        # Assign a random color for each topic
         color = (random.random(), random.random(), random.random(), 1.0)
         
         for word in words_in_topic:
