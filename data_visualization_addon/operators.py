@@ -88,7 +88,6 @@ class OBJECT_OT_DeleteWordCloudTFIDF(bpy.types.Operator):
         delete_word_cloud()            
         return {'FINISHED'}
     
-# Operator to create Histogram
 class OBJECT_OT_CreateHistogram(bpy.types.Operator):
     bl_idname = "object.create_histogram"
     bl_label = "Create Histogram"
@@ -98,7 +97,6 @@ class OBJECT_OT_CreateHistogram(bpy.types.Operator):
         return create_histogram(context)
 
 
-# Operator to delete Histogram
 class OBJECT_OT_DeleteHistogram(bpy.types.Operator):
     bl_idname = "object.delete_histogram"
     bl_label = "Delete Histogram"
@@ -251,18 +249,26 @@ class OBJECT_OT_CreateScatterPlot(bpy.types.Operator):
             self.report({'ERROR'}, "CSV file not set or does not exist")
             return {'CANCELLED'}
 
+        color = context.scene.scatter_plot_color
+
+        # Create a material for the line plot
+        material = bpy.data.materials.new(name="ScatterPlot_Material")
+        material.diffuse_color = color
         points = []
         labels = []
         unique_labels = set()
         try:
             with open(csv_filepath, newline='') as csvfile:
                 csv_reader = csv.DictReader(csvfile)
+                col_x = context.scene.csv_column_x
+                col_y = context.scene.csv_column_y
+                col_z = context.scene.csv_column_z
                 for row in csv_reader:
                     try:
                         if len(row) >= 2:
-                            x = float(row.get('X', 0))  # Default to 0 if 'X' column is missing
-                            y = float(row.get('Y', 0))  # Default to 0 if 'Y' column is missing
-                            z = float(row.get('Z', 0))  # Default to 0 if 'Z' column is missing
+                            x = float(row.get(col_x, 0))  # Default to 0 if 'X' column is missing
+                            y = float(row.get(col_y, 0))  # Default to 0 if 'Y' column is missing
+                            z = float(row.get(col_z, 0))  # Default to 0 if 'Z' column is missing
                             label = row.get('Label', 'default')
                             points.append((x, y, z))
                             labels.append(label)
@@ -285,6 +291,7 @@ class OBJECT_OT_CreateScatterPlot(bpy.types.Operator):
         for point in points:
             bpy.ops.mesh.primitive_uv_sphere_add(radius=0.5, location=point)
             new_obj = context.active_object
+            new_obj.data.materials.append(material)
             for coll in new_obj.users_collection:
                 coll.objects.unlink(new_obj)
             scatter_collection.objects.link(new_obj)
