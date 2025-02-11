@@ -28,6 +28,9 @@ def register_axis_color_properties():
     bpy.types.Scene.line_plot_color = bpy.props.FloatVectorProperty(
         name="Line Plot Color", subtype='COLOR', size=4, default=(1, 1, 1, 1)  # White by default
     )
+    bpy.types.Scene.scatter_plot_color = bpy.props.FloatVectorProperty(
+        name="Scatter Plot Color", subtype='COLOR', size=4, default=(1, 1, 1, 1)  # White by default
+    )
     bpy.types.Scene.line_plot_size = bpy.props.FloatProperty(
         name="Line Size", default=0.1, min=0, description="Thickness of the line plot"
     )
