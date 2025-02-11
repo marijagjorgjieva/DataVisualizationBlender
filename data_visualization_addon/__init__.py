@@ -52,8 +52,8 @@ classes = [
     OBJECT_OT_DeleteWordCloud,
     OBJECT_OT_AddTopicCloud,
     OBJECT_OT_DeleteTopicCloud,
-    
-    
+
+
     # Panels
     VIEW3D_PT_DataVisualizationPanel,
     VIEW3D_PT_AxisCreatorPanel,
@@ -96,7 +96,7 @@ def register():
         min=0.0, max=1.0,
         description="Color for words with the highest frequency"
     )
-    
+
     bpy.types.Scene.word_limit = bpy.props.IntProperty(
         name="Word Limit",
         default=50,
@@ -111,6 +111,9 @@ def register():
         max=20,
         description="Number of topics to extract"
     )
+    bpy.types.Scene.csv_column_x = bpy.props.StringProperty(name="CSV X Column", default="X")
+    bpy.types.Scene.csv_column_y = bpy.props.StringProperty(name="CSV Y Column", default="Y")
+    bpy.types.Scene.csv_column_z = bpy.props.StringProperty(name="CSV Z Column", default="Z")
     for cls in classes:
         bpy.utils.register_class(cls)
 
@@ -123,6 +126,7 @@ def unregister():
     del bpy.types.Scene.y_axis_color
     del bpy.types.Scene.z_axis_color
     del bpy.types.Scene.line_plot_color
+    del bpy.types.Scene.scatter_plot_color
     del bpy.types.Scene.line_plot_size
     del bpy.types.Scene.bar_plot_color
     del bpy.types.Scene.bar_plot_width
@@ -132,6 +136,9 @@ def unregister():
     del bpy.types.Scene.high_frequency_color
     del bpy.types.Scene.word_limit
     del bpy.types.Scene.n_topics
+    del bpy.types.Scene.csv_column_x
+    del bpy.types.Scene.csv_column_y
+    del bpy.types.Scene.csv_column_z
 
     for cls in classes:
         bpy.utils.unregister_class(cls)
